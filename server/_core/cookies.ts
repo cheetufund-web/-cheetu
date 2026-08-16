@@ -42,7 +42,9 @@ export function getSessionCookieOptions(
   return {
     httpOnly: true,
     path: "/",
-    sameSite: "none",
-    secure: isSecureRequest(req),
+    // The frontend and API are same-origin on Vercel. `lax` avoids browsers
+    // rejecting `SameSite=None` cookies when a proxy reports an insecure hop.
+    sameSite: "lax",
+    secure: isSecureRequest(req) || process.env.NODE_ENV === "production",
   };
 }
