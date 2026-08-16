@@ -335,7 +335,9 @@ var SDKServer = class {
     return this.signSession(
       {
         openId,
-        appId: ENV.appId,
+        // Local OTP authentication is independent of Manus OAuth. Keep the
+        // session payload valid when VITE_APP_ID is not configured in Vercel.
+        appId: ENV.appId || "cheetu-otp",
         name: options.name || "",
         authMethod: options.authMethod
       },
