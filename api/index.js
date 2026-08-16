@@ -60,7 +60,7 @@ async function getDb() {
     database = null;
     throw error;
   }
-  await Promise.all([
+  const indexResults = await Promise.allSettled([
     database.collection("members").createIndex({ publicToken: 1 }, { unique: true }),
     database.collection("members").createIndex({ chitGroupId: 1 }),
     database.collection("payments").createIndex({ memberId: 1, monthNumber: 1 }, { unique: true }),
@@ -68,6 +68,12 @@ async function getDb() {
     database.collection("otpChallenges").createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
     database.collection("otpChallenges").createIndex({ email: 1 }, { unique: true })
   ]);
+  const indexFailures = indexResults.filter((result) => result.status === "rejected");
+  if (indexFailures.length > 0) {
+    reportServerError("mongodb.index_initialization_failed", new Error(`${indexFailures.length} index operation(s) failed`), {
+      failedCount: indexFailures.length
+    });
+  }
   return database;
 }
 async function getCollection(name) {
