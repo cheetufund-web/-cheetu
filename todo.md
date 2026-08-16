@@ -85,7 +85,32 @@
 - [x] Add regression coverage and verify the dashboard loads after Gmail OTP login.
 - [x] Add a focused OTP-admin authentication regression test proving the Manus user-info permission path is not called.
 - [x] Re-run typecheck and Vitest after the permission fix; 15 tests passed and 2 live tests were skipped.
-- [ ] Prepare the Cheetu checkpoint for external production deployment and document the Vercel release steps.
-- [ ] Persist OTP challenges in MongoDB with expiry and attempt limits for serverless-safe verification.
-- [ ] Add production error-monitoring hooks for authentication and MongoDB connection failures.
-- [ ] Verify production readiness and document the real Gmail OTP smoke test procedure.
+- [x] Prepare the Cheetu checkpoint for external production deployment and document the Vercel release steps.
+- [x] Persist OTP challenges in MongoDB with expiry and attempt limits for serverless-safe verification.
+- [x] Add production error-monitoring hooks for authentication and MongoDB connection failures.
+- [x] Verify production readiness and document the real Gmail OTP smoke test procedure.
+- [x] Diagnose the Vercel root 404 and confirm whether the deployment is missing the built client output or server route.
+- [x] Add Vercel-compatible build and routing configuration for the Cheetu frontend and tRPC API.
+- [x] Validate the production build and document the Vercel redeployment steps.
+- [x] Document Vercel redeployment steps, required environment variables, and `/` plus `/api/trpc` verification in README.md.
+- [ ] After the user redeploys, verify the live Vercel root page and API smoke test if access is available.
+- [x] Add structured monitoring for OTP verification failures and local session-resolution failures with sensitive data redacted.
+- [ ] Verify the redeployed Vercel root, `/api/trpc`, and one real Gmail OTP login before marking production readiness complete.
+- [x] Diagnose the failed Vercel deployment from the GitHub `main` branch and identify the exact build failure.
+- [ ] Ensure Vercel uses the Vite client build command and checked-in routing configuration.
+- [x] Document rotation of the exposed MongoDB, Gmail App Password, and JWT credentials before redeployment.
+- [ ] Validate the corrected build and complete a safe Vercel redeployment procedure.
+- [x] Diagnose why Vercel cannot find `api/index.ts` in the GitHub deployment branch.
+- [ ] Align `vercel.json` with the serverless function files actually committed to the repository.
+- [ ] Validate the corrected configuration and document the required GitHub push/redeploy sequence.
+- [x] Diagnose why the deployed Vercel root does not show the Cheetu OTP login page.
+- [x] Correct the frontend build or SPA rewrite so `/` serves the Cheetu client entrypoint.
+- [ ] Validate the deployed root and document the required redeploy/cache-refresh check.
+- [x] Diagnose the live Vercel `FUNCTION_INVOCATION_FAILED` crash for the root/API request.
+- [x] Remove remaining Manus-only runtime dependencies from the Vercel client and API path.
+- [ ] Harden the Vercel entrypoint and verify the Gmail OTP page, API health, and production build.
+- [x] Document credential rotation and clean Vercel redeployment steps.
+- [ ] Verify the redeployed Vercel root page shows the Cheetu OTP login screen instead of a function error or blank page.
+- [ ] Verify the redeployed `/api/trpc/auth.me` and one protected admin tRPC route return expected responses on Vercel.
+- [ ] Complete one real production Gmail OTP login on the redeployed Vercel app and confirm dashboard entry.
+- [x] Save and deliver the latest Manus-independent Cheetu source checkpoint for GitHub/Vercel deployment.

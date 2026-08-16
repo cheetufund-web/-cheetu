@@ -1,5 +1,6 @@
 import { MongoClient, ObjectId, type Collection, type Db } from "mongodb";
 import { ENV } from "./_core/env";
+import { reportServerError } from "./monitoring";
 import type { InsertUser, User } from "../drizzle/schema";
 
 let client: MongoClient | null = null;
@@ -58,13 +59,22 @@ export async function getDb() {
   if (database) return database;
   if (!process.env.MONGODB_URI) throw new Error("MONGODB_URI is not configured");
   client = new MongoClient(process.env.MONGODB_URI, { maxPoolSize: 10, serverSelectionTimeoutMS: 5000, connectTimeoutMS: 5000, socketTimeoutMS: 5000 });
-  await client.connect();
-  database = client.db("kukkal_seat_chits");
+  try {
+    await client.connect();
+    database = client.db("kukkal_seat_chits");
+  } catch (error) {
+    reportServerError("mongodb.connection_failed", error);
+    client = null;
+    database = null;
+    throw error;
+  }
   await Promise.all([
     database.collection("members").createIndex({ publicToken: 1 }, { unique: true }),
     database.collection("members").createIndex({ chitGroupId: 1 }),
     database.collection("payments").createIndex({ memberId: 1, monthNumber: 1 }, { unique: true }),
     database.collection("auctions").createIndex({ chitGroupId: 1, monthNumber: 1 }, { unique: true }),
+    database.collection("otpChallenges").createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
+    database.collection("otpChallenges").createIndex({ email: 1 }, { unique: true }),
   ]);
   return database;
 }
@@ -97,6 +107,31 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     },
     { upsert: true },
   );
+}
+
+export type OtpChallengeRecord = {
+  email: string;
+  codeHash: string;
+  expiresAt: Date;
+  attempts: number;
+  createdAt: Date;
+};
+
+export async function saveOtpChallenge(challenge: OtpChallengeRecord) {
+  const challenges = await getCollection<OtpChallengeRecord>("otpChallenges");
+  await challenges.replaceOne({ email: challenge.email }, challenge, { upsert: true });
+}
+
+export async function getOtpChallenge(email: string) {
+  return (await getCollection<OtpChallengeRecord>("otpChallenges")).findOne({ email });
+}
+
+export async function updateOtpAttempts(email: string, attempts: number) {
+  await (await getCollection<OtpChallengeRecord>("otpChallenges")).updateOne({ email }, { $set: { attempts } });
+}
+
+export async function deleteOtpChallenge(email: string) {
+  await (await getCollection<OtpChallengeRecord>("otpChallenges")).deleteOne({ email });
 }
 
 export async function getUserByOpenId(openId: string) {

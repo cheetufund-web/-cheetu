@@ -21,7 +21,7 @@ afterEach(() => {
 });
 
 describe("local OTP admin authentication", () => {
-  it("does not call the Manus user-info permission path", async () => {
+  it("resolves the OTP admin session locally without a Manus permission client", async () => {
     const sessionToken = await sdk.createSessionToken(ENV.ownerOpenId, {
       name: "Cheetu Administrator",
       authMethod: "otp",
@@ -31,17 +31,13 @@ describe("local OTP admin authentication", () => {
       .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce(ownerUser);
     const upsertUser = vi.spyOn(db, "upsertUser").mockResolvedValue(undefined);
-    const getUserInfoWithJwt = vi
-      .spyOn(sdk, "getUserInfoWithJwt")
-      .mockRejectedValue(new Error("Manus permission endpoint must not be called"));
-
     const user = await sdk.authenticateRequest({
       headers: { cookie: `${OTP_COOKIE_NAME}=${sessionToken}` },
     } as never);
 
     expect(user.role).toBe("admin");
     expect(user.loginMethod).toBe("otp");
-    expect(getUserInfoWithJwt).not.toHaveBeenCalled();
+    expect((sdk as Record<string, unknown>).getUserInfoWithJwt).toBeUndefined();
     expect(upsertUser).toHaveBeenCalledWith(
       expect.objectContaining({
         openId: ENV.ownerOpenId,

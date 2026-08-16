@@ -1,26 +1,33 @@
-import express from "express";
-import { createServer } from "http";
-import { createExpressMiddleware } from "@trpc/server/adapters/express";
+import express, { type Express } from "express";
 import { appRouter } from "../routers";
-import { registerOAuthRoutes } from "./oauth";
-import { registerStorageProxy } from "./storageProxy";
 import { createContext } from "./context";
+import { createExpressMiddleware } from "@trpc/server/adapters/express";
 
-export async function createApp() {
+export function createApiApp(): Express {
   const app = express();
-  const server = createServer(app);
-
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
-  registerStorageProxy(app);
-  registerOAuthRoutes(app);
   app.use(
     "/api/trpc",
     createExpressMiddleware({
       router: appRouter,
       createContext,
-    })
+    }),
   );
-
-  return { app, server };
+  return app;
 }
+
+export async function createDevelopmentApp(server: import("node:http").Server): Promise<Express> {
+  const app = createApiApp();
+  const { setupVite } = await import("./vite");
+  await setupVite(app, server);
+  return app;
+}
+
+export function createProductionApp(): Express {
+  const app = createApiApp();
+  return app;
+}
+
+export default createApiApp;
+

@@ -11,6 +11,7 @@ import { sdk } from "./_core/sdk";
 import { DEMO_OTP_EMAIL, normalizeEmail, requestOtp, verifyOtp } from "./otp";
 import { sendOtpEmail } from "./mailer";
 import { isMongoUnavailable } from "./mongo-errors";
+import { reportServerError } from "./monitoring";
 
 const groupInput = z.object({
   name: z.string().min(2),
@@ -32,11 +33,11 @@ export const appRouter = router({
       if (email !== normalizeEmail(DEMO_OTP_EMAIL)) {
         throw new TRPCError({ code: "FORBIDDEN", message: "This demo is configured for the administrator email only." });
       }
-      const challenge = requestOtp(email);
+      const challenge = await requestOtp(email);
       try {
         await sendOtpEmail(email, challenge.code);
       } catch (error) {
-        console.error("[OTP] Mail delivery failed:", error);
+        reportServerError("otp.mail_delivery_failed", error, { email });
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "OTP delivery is not configured. Enable SMTP or use development mode." });
       }
       return { expiresAt: challenge.expiresAt, demoCode: challenge.demoCode };
@@ -46,8 +47,11 @@ export const appRouter = router({
       if (email !== normalizeEmail(DEMO_OTP_EMAIL)) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Only the configured administrator can sign in." });
       }
-      const result = verifyOtp(email, input.code);
-      if (!result.ok) throw new TRPCError({ code: "UNAUTHORIZED", message: result.reason === "expired" ? "The OTP expired. Request a new code." : result.reason === "locked" ? "Too many attempts. Request a new code." : "Invalid OTP." });
+      const result = await verifyOtp(email, input.code);
+      if (!result.ok) {
+        reportServerError("auth.otp_verification_failed", new Error(result.reason), { email, reason: result.reason });
+        throw new TRPCError({ code: "UNAUTHORIZED", message: result.reason === "expired" ? "The OTP expired. Request a new code." : result.reason === "locked" ? "Too many attempts. Request a new code." : "Invalid OTP." });
+      }
       const sessionToken = await sdk.createSessionToken(process.env.OWNER_OPEN_ID || "demo-owner", { name: "Cheetu Administrator", authMethod: "otp" });
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.cookie(OTP_COOKIE_NAME, sessionToken, cookieOptions);
