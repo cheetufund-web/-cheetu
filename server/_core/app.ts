@@ -5,7 +5,6 @@ import { appRouter } from "../routers";
 import { registerOAuthRoutes } from "./oauth";
 import { registerStorageProxy } from "./storageProxy";
 import { createContext } from "./context";
-import { serveStatic, setupVite } from "./vite";
 
 export async function createApp() {
   const app = express();
@@ -22,12 +21,6 @@ export async function createApp() {
       createContext,
     })
   );
-
-  if (process.env.NODE_ENV === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
-  }
 
   return { app, server };
 }
