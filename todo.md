@@ -1,0 +1,91 @@
+# Project TODO
+
+- [x] Replace the starter example with an elegant Kukkal Seat Chit Fund Management experience.
+- [x] Configure MongoDB as the sole application database and document the required connection secret.
+- [x] Define MongoDB-backed models for chit groups, members, installment payments, auctions, and public share tokens.
+- [x] Add strict admin-only access for all management and data-entry procedures.
+- [x] Add chit group creation, editing, listing, and status management.
+- [x] Add member creation, editing, assignment to chit groups, and public link management.
+- [x] Add monthly installment payment recording with paid and pending states.
+- [x] Add monthly auction winner and bid amount recording.
+- [x] Add dashboard summary cards for collections, pending payments, active groups, and upcoming auctions.
+- [x] Add unique unauthenticated customer pages showing chit details, payment history, and upcoming dues.
+- [x] Add copy/share controls for each member's public page without exposing admin data.
+- [x] Add responsive, polished visual design with accessible loading, empty, and error states.
+- [x] Add and run Vitest coverage for admin protection and core auth/config operations.
+- [x] Verify the UI in desktop preview and browser access-control states.
+- [x] Save the completed project checkpoint for delivery.
+- [x] Validate the newly supplied MongoDB URI format with the lightweight configuration test before implementing persistence.
+- [x] Ensure the MongoDB URI is never exposed in client code, logs, or public customer pages.
+- [x] Verify MongoDB Atlas network access for the supplied sandbox IP and inspect the attached credential file without exposing secrets.
+- [x] Retest live MongoDB connectivity after Atlas network access is confirmed; sandbox TLS handshake remains blocked and documented.
+- [x] Rename visible product branding from Kukkal Seat to Cheetu across the application.
+- [x] Add a shared English/Tamil language toggle for admin and public customer pages.
+- [x] Translate the primary navigation, headings, status labels, forms, and customer-facing summary text into Tamil.
+- [x] Verify the language toggle and branding in desktop and mobile previews, then save a new checkpoint.
+- [x] Translate every remaining visible English label, option, button, status, empty state, and customer summary through the shared language helper.
+- [x] Capture a real mobile-size preview after localization changes and save a fresh checkpoint.
+- [x] Translate the remaining Home group-form labels, placeholders, list fragments, View all action, and group/status text.
+- [x] Route operations payment and auction status values through Tamil-aware labels.
+- [x] Save a fresh checkpoint after the final localization fixes.
+- [x] Diagnose the OAuth callback failure reported by the user.
+- [x] Restore successful OAuth session creation without weakening admin-only access control.
+- [x] Add or update authentication validation coverage and save a recovery checkpoint after verification.
+- [x] Supersede the blank external OAuth portal verification with the locally verified email OTP flow.
+- [x] Add focused coverage for the owner-only MongoDB-unavailable auth fallback and non-admin denial.
+- [x] Save a new recovery checkpoint after OAuth verification.
+- [x] Package the current Cheetu code files for user download.
+- [x] Run the local typecheck, test suite, production build, and preview verification for the delivered code.
+- [x] Save a delivery checkpoint after the current OAuth resilience changes.
+- [x] Replace Manus OAuth sign-in with email OTP authentication.
+- [x] Add server-side OTP generation, expiration, verification, session creation, and admin-only authorization.
+- [x] Configure an optional SMTP mailer path without requiring credentials for local dummy mode.
+- [x] Update the app theme to a polished pink-and-white visual system.
+- [x] Add Windows-friendly setup guidance and fix cross-platform development command behavior.
+- [x] Add tests for OTP expiry, invalid-code rejection, and owner/admin authorization.
+- [x] Validate the updated app and save a new delivery checkpoint.
+- [x] Add development-only dummy email OTP mode with a documented demo email and local OTP display.
+- [x] Keep SMTP email delivery as an optional production configuration without requiring it for local testing.
+- [x] Replace the current sign-in screen with email and OTP fields for the dummy flow.
+- [x] Apply pink-and-white theme tokens and verify the updated UI.
+- [x] Diagnose the dashboard tRPC MongoDB server-selection timeout reported on the authenticated home page.
+- [x] Return an actionable database-unavailable state for dashboard reads without silently falling back for writes.
+- [x] Add regression coverage for MongoDB-unavailable dashboard behavior and preserve admin-only access.
+- [x] Verify the preview no longer shows a raw API query error and save a recovery checkpoint.
+- [x] Add a Vitest test that exercises dashboard.summary with simulated MongoDB unavailability and asserts the safe payload.
+- [x] Extend access-control coverage to confirm non-admin users cannot reach the dashboard fallback path.
+- [x] Re-verify the preview after the timeout fix and save a new recovery checkpoint for this exact state.
+- [x] Verify the current server-side MongoDB URI configuration without exposing its secret value.
+- [x] Diagnose and resolve the Atlas connectivity failure affecting dashboard data reads.
+- [x] Confirm the configured MongoDB endpoint accepts application connectivity; application writes remain protected from unverified test data.
+- [x] Save a checkpoint after successful MongoDB connection verification.
+- [x] Re-run an authenticated dashboard/admin read after Atlas connectivity is restored; Atlas ping and application collection read now succeed.
+- [x] Verify a real application database read against MongoDB without inserting test data.
+- [x] Save a new checkpoint after successful application-level MongoDB verification.
+- [x] Verify the real admin tRPC dashboard procedure returns live MongoDB data after Atlas access is restored.
+- [x] Save a new checkpoint after the successful live admin dashboard verification.
+- [x] Remove the local startup dependency on missing Manus OAuth environment variables when dummy OTP mode is enabled.
+- [x] Prevent undefined analytics placeholders from generating malformed `/%VITE_ANALYTICS_ENDPOINT%/umami` requests.
+- [x] Document the required local Windows environment values and validate the corrected `pnpm dev` startup.
+- [x] Save a recovery checkpoint after the Windows startup fixes.
+- [x] Document the complete Windows local environment setup with required versus optional variables, including JWT_SECRET and MONGODB_URI.
+- [x] Validate `pnpm dev` in a local-like environment with dummy OTP enabled and without OAUTH_SERVER_URL or analytics variables.
+- [x] Save a new checkpoint after the Windows startup fixes are validated in the missing-environment scenario.
+- [x] Save a final checkpoint after the Windows startup fixes and missing-environment validation.
+- [x] Configure Gmail SMTP for `cheetufund@gmail.com` and verify SMTP authentication without sending a test email.
+- [x] Add an always-visible logout button to the admin sidebar/account area.
+- [x] Remove the unused Page 2 placeholder navigation item and verify the remaining navigation labels.
+- [x] Stop the persisted demo session from auto-entering the dashboard before Gmail OTP authentication.
+- [x] Require `cheetufund@gmail.com` to request and verify an OTP before creating the admin session.
+- [x] Verify logout, fresh login, OTP delivery, and post-verification dashboard entry.
+- [x] Manually verify Sign out clears the dedicated OTP session, returns to the OTP screen, and permits a fresh Gmail OTP login.
+- [x] After signing out, request a new OTP for `cheetufund@gmail.com` and verify successful dashboard entry again end-to-end.
+- [x] Trace the tRPC permission error 10002 affecting the Gmail OTP admin dashboard.
+- [x] Remove the inherited Manus permission dependency from the failing admin data path.
+- [x] Add regression coverage and verify the dashboard loads after Gmail OTP login.
+- [x] Add a focused OTP-admin authentication regression test proving the Manus user-info permission path is not called.
+- [x] Re-run typecheck and Vitest after the permission fix; 15 tests passed and 2 live tests were skipped.
+- [ ] Prepare the Cheetu checkpoint for external production deployment and document the Vercel release steps.
+- [ ] Persist OTP challenges in MongoDB with expiry and attempt limits for serverless-safe verification.
+- [ ] Add production error-monitoring hooks for authentication and MongoDB connection failures.
+- [ ] Verify production readiness and document the real Gmail OTP smoke test procedure.
