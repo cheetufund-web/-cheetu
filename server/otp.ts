@@ -12,7 +12,7 @@ type MemoryOtpChallenge = {
 
 const challenges = new Map<string, MemoryOtpChallenge>();
 
-export const DEMO_OTP_EMAIL = process.env.DEMO_OTP_EMAIL || "demo@cheetu.local";
+export const DEMO_OTP_EMAIL = process.env.DEMO_OTP_EMAIL || "cheetufund@gmail.com";
 export const DEMO_OTP_CODE = process.env.DEMO_OTP_CODE || "123456";
 
 export function normalizeEmail(email: string) {
