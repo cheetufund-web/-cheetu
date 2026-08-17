@@ -691,12 +691,18 @@ var appRouter = router({
 });
 
 // server/_core/context.ts
+function isExpectedAnonymousRequest(error) {
+  const message = error instanceof Error ? error.message : String(error);
+  return message === "Missing session cookie" || message === "Invalid session cookie";
+}
 async function createContext(opts) {
   let user = null;
   try {
     user = await sdk.authenticateRequest(opts.req);
   } catch (error) {
-    reportServerError("auth.context_resolution_failed", error);
+    if (!isExpectedAnonymousRequest(error)) {
+      reportServerError("auth.context_resolution_failed", error);
+    }
     user = null;
   }
   return {
