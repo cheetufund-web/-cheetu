@@ -452,7 +452,7 @@ import { createHash, randomInt } from "node:crypto";
 var OTP_TTL_MS = 5 * 60 * 1e3;
 var MAX_ATTEMPTS = 5;
 var challenges = /* @__PURE__ */ new Map();
-var DEMO_OTP_EMAIL = process.env.DEMO_OTP_EMAIL || "demo@cheetu.local";
+var DEMO_OTP_EMAIL = process.env.DEMO_OTP_EMAIL || "cheetufund@gmail.com";
 var DEMO_OTP_CODE = process.env.DEMO_OTP_CODE || "123456";
 function normalizeEmail(email) {
   return email.trim().toLowerCase();
@@ -728,8 +728,8 @@ function createApiApp() {
   return app;
 }
 
-// api/index.ts
-var index_default = createApiApp();
+// .vercel-bundle-entry.ts
+var vercel_bundle_entry_default = createApiApp();
 export {
-  index_default as default
+  vercel_bundle_entry_default as default
 };
