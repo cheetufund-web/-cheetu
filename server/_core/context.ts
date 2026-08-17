@@ -9,6 +9,11 @@ export type TrpcContext = {
   user: User | null;
 };
 
+function isExpectedAnonymousRequest(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+  return message === "Missing session cookie" || message === "Invalid session cookie";
+}
+
 export async function createContext(
   opts: CreateExpressContextOptions
 ): Promise<TrpcContext> {
@@ -17,7 +22,9 @@ export async function createContext(
   try {
     user = await sdk.authenticateRequest(opts.req);
   } catch (error) {
-    reportServerError("auth.context_resolution_failed", error);
+    if (!isExpectedAnonymousRequest(error)) {
+      reportServerError("auth.context_resolution_failed", error);
+    }
     // Authentication is optional for public procedures.
     user = null;
   }
