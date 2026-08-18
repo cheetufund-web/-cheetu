@@ -8,6 +8,7 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import Home from "./pages/Home";
 import CustomerPage from "./pages/CustomerPage";
 import Operations from "./pages/Operations";
+import Groups from "./pages/Groups";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -15,7 +16,9 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/share/:token"} component={CustomerPage} />
+      <Route path={"/customer/:token"} component={CustomerPage} />
       <Route path={"/operations"} component={Operations} />
+      <Route path={"/groups"} component={Groups} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
