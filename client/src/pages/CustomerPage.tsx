@@ -9,8 +9,10 @@ const money = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR
 
 export default function CustomerPage() {
   const { t } = useLanguage();
-  const [, params] = useRoute("/share/:token");
-  const customer = trpc.public.memberByToken.useQuery({ token: params?.token || "" }, { enabled: Boolean(params?.token) });
+  const [, shareParams] = useRoute("/share/:token");
+  const [, legacyParams] = useRoute("/customer/:token");
+  const token = shareParams?.token || legacyParams?.token || "";
+  const customer = trpc.public.memberByToken.useQuery({ token }, { enabled: Boolean(token) });
   if (customer.isLoading) return <div className="min-h-screen grid place-items-center bg-[#fff3f8]"><Loader2 className="animate-spin text-[#c83d73]" /></div>;
   if (customer.isError || !customer.data) return <div className="min-h-screen grid place-items-center bg-[#fff3f8] p-6"><Card className="max-w-md border-[#f1c3d5] bg-[#ffffff]"><CardHeader><LockKeyhole className="h-8 w-8 text-[#c83d73]" /><CardTitle className="font-serif text-2xl">{t("Link unavailable", "இணைப்பு கிடைக்கவில்லை")}</CardTitle><p className="text-sm text-[#8b6474]">{t("This customer page may have expired or the address may be incomplete.", "இந்த வாடிக்கையாளர் பக்கம் காலாவதியாகி இருக்கலாம் அல்லது முகவரி முழுமையற்றதாக இருக்கலாம்.")}</p></CardHeader><CardContent><Link href="/" className="text-sm text-[#c83d73] flex items-center gap-2"><ArrowLeft className="h-4 w-4" />{t("Return to Cheetu", "சீட்டுக்குத் திரும்பவும்")}</Link></CardContent></Card></div>;
   const { member, group, payments, auctions } = customer.data as any;
