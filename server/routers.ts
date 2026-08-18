@@ -99,6 +99,16 @@ export const appRouter = router({
       await (await getCollection<ChitGroup>("chitGroups")).updateOne({ _id: oid(input.id) }, { $set: { status: input.status, updatedAt: new Date() } });
       return { success: true };
     }),
+    delete: adminProcedure.input(z.object({ id: z.string() })).mutation(async ({ input }) => {
+      const groupId = oid(input.id);
+      const members = await (await getCollection<Member>("members")).find({ chitGroupId: groupId }).project({ _id: 1 }).toArray();
+      const memberIds = members.map(member => member._id).filter(Boolean);
+      await (await getCollection<Payment>("payments")).deleteMany({ $or: [{ chitGroupId: groupId }, ...(memberIds.length ? [{ memberId: { $in: memberIds } }] : [])] });
+      await (await getCollection<Auction>("auctions")).deleteMany({ chitGroupId: groupId });
+      await (await getCollection<Member>("members")).deleteMany({ chitGroupId: groupId });
+      await (await getCollection<ChitGroup>("chitGroups")).deleteOne({ _id: groupId });
+      return { success: true };
+    }),
   }),
   members: router({
     list: adminProcedure.query(async () => {
@@ -119,6 +129,16 @@ export const appRouter = router({
       await (await getCollection<Member>("members")).updateOne({ _id: oid(input.id) }, { $set: { ...input.data, chitGroupId: oid(input.data.chitGroupId), updatedAt: new Date() } });
       return { success: true };
     }),
+    delete: adminProcedure.input(z.object({ id: z.string() })).mutation(async ({ input }) => {
+      await (await getCollection<Member>("members")).deleteOne({ _id: oid(input.id) });
+      await (await getCollection<Payment>("payments")).deleteMany({ memberId: oid(input.id) });
+      return { success: true };
+    }),
+    regeneratePublicToken: adminProcedure.input(z.object({ id: z.string() })).mutation(async ({ input }) => {
+      const publicToken = nanoid(18);
+      await (await getCollection<Member>("members")).updateOne({ _id: oid(input.id) }, { $set: { publicToken, updatedAt: new Date() } });
+      return { success: true, publicToken };
+    }),
   }),
   payments: router({
     list: adminProcedure.input(z.object({ memberId: z.string().optional() }).optional()).query(async ({ input }) => {
@@ -131,6 +151,10 @@ export const appRouter = router({
       await (await getCollection<Payment>("payments")).updateOne({ memberId: payment.memberId, monthNumber: payment.monthNumber }, { $set: payment }, { upsert: true });
       return { success: true };
     }),
+    delete: adminProcedure.input(z.object({ id: z.string() })).mutation(async ({ input }) => {
+      await (await getCollection<Payment>("payments")).deleteOne({ _id: oid(input.id) });
+      return { success: true };
+    }),
   }),
   auctions: router({
     list: adminProcedure.query(async () => toSafe(await (await getCollection<Auction>("auctions")).find({}).sort({ auctionDate: -1 }).toArray())),
@@ -138,6 +162,14 @@ export const appRouter = router({
       const now = new Date();
       const auction = { ...input, chitGroupId: oid(input.chitGroupId), winnerMemberId: oid(input.winnerMemberId), createdAt: now, updatedAt: now } as Auction;
       await (await getCollection<Auction>("auctions")).updateOne({ chitGroupId: auction.chitGroupId, monthNumber: auction.monthNumber }, { $set: auction }, { upsert: true });
+      return { success: true };
+    }),
+    update: adminProcedure.input(z.object({ id: z.string(), chitGroupId: z.string(), monthNumber: z.number().int().positive(), auctionDate: z.string(), winnerMemberId: z.string(), bidAmount: z.number().positive() })).mutation(async ({ input }) => {
+      await (await getCollection<Auction>("auctions")).updateOne({ _id: oid(input.id) }, { $set: { chitGroupId: oid(input.chitGroupId), monthNumber: input.monthNumber, auctionDate: input.auctionDate, winnerMemberId: oid(input.winnerMemberId), bidAmount: input.bidAmount, updatedAt: new Date() } });
+      return { success: true };
+    }),
+    delete: adminProcedure.input(z.object({ id: z.string() })).mutation(async ({ input }) => {
+      await (await getCollection<Auction>("auctions")).deleteOne({ _id: oid(input.id) });
       return { success: true };
     }),
   }),
